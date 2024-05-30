@@ -4,28 +4,27 @@ from .models import MyModel
 
 
 def my_view(request):
-
     for i in range(5):
-        MyModel.objects.create(name='Пример {}'.format(i))
-
+        MyModel.objects.create(name=f'Пример {i}')
         my_model_objs = MyModel.objects.all()
 
 
     for obj in my_model_objs:
-        obj.name = '{} ({})'.format(obj.name, obj.id)
+        obj.name = f'{obj.name} ({obj.id})'
         obj.save()
+        my_model_objs = MyModel.objects.all()
 
     for obj in my_model_objs:
-        if any(char.isdigit() and int(char) % 2 != 0 for char in obj.name):
+        name_parts = obj.name.split('(')
+        model = name_parts[-1]
+        model = model.strip(')')
+        my_model = int(model)
+        if my_model % 2 != 0:
             obj.delete()
 
     ctx = {
-        'my_model_objs': my_model_objs
+        'my_model_objs': MyModel.objects.all()
     }
 
     return render(request, 'modulapp/index.html', context=ctx)
-
-
-
-
 
